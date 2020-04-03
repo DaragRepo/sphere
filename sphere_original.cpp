@@ -12,13 +12,16 @@ all: $(input)
 make input=X.cpp
 
 ****/
+
 #include "angel/Angel.h"
 #include <GL/freeglut.h>
 #include <math.h>
 
 using namespace std;
 
-vec3 quad_data[342]; // 8 rows of 18 quads
+const int N = 342;
+
+vec3 quad_data[N]; // 8 rows of 18 quads
 
 
 void display(void);
@@ -104,6 +107,7 @@ int main(int argc, char** argv) {
 
 
 void display(void) {
+
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
   glColor3f(1.0, 1.0, 1.0);
@@ -171,17 +175,44 @@ void writeBitmapString(void *font, char *string)
 
 void keyPressed(unsigned char key, int x, int y) {
 
-  glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+
+  /*
+      A polygon has two sides---front and back---and might be rendered differently
+      depending on which side is facing the viewer. This allows you to have
+      cutaway views of solid objects in which there is an obvious distinction
+      between the parts that are inside and those that are outside. By default,
+      both front and back faces are drawn in the same way. To change this, or to
+      draw only outlines or vertices, use glPolygonMode(). it controls the drawing mode for
+      a polygon’s front and back faces. The parameter face must be GL_FRONT_AND_BACK; while
+      mode can be GL_POINT, GL_LINE, GL_FILL to indicate whether the polygon should
+      be drawn as points, outlined, or filled. By default, both the front and
+      back faces are drawn filled.
+  */
+  glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+
 
   switch (key) {
   case 'a' :
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    glColor3f(1.0, 1.0, 1.0);
 
     glBegin(GL_LINES);
-    for (int i = 0; i < 342; i = i + 1 ) {
+
+    for (int i = 0; i < N; i = i + 1 ) {
 
       glVertex3d(quad_data[i][0], quad_data[i][1], quad_data[i][2]);
+
+      /* 
+        to draw a sphere like GL_POLYGON in GL_LINES we need to draw the old points to connect the lines 
+        that hasn't been connected because remember that in lines we connect each 2 points but we don't 
+        connect each 4 lines together 
+      */
+      for (int j =  i  ; j >= i - 2  ; j--) {
+        glVertex3d(quad_data[j][0], quad_data[j][1], quad_data[j][2]);
+      }
+   
     }
 
     glEnd();
@@ -189,31 +220,36 @@ void keyPressed(unsigned char key, int x, int y) {
     break;
 
   case 'b':
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    glColor3f(1.0, 1.0, 1.0);
 
     glBegin(GL_POLYGON);
-    for (int i = 0; i < 342; i++)
+
+    for (int i = 0; i < N; i++)
       glVertex3d(quad_data[i][0], quad_data[i][1], quad_data[i][2]);
     glEnd();
 
     break;
 
   case 'c':
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     glColor3d(0.1, 0.7, 0.6);
+
     glBegin(GL_POLYGON);
-    for (int i = 0; i < 342; i++)
+
+    for (int i = 0; i < N; i++)
       glVertex3d(quad_data[i][0], quad_data[i][1], quad_data[i][2]);
     glEnd();
 
     break;
 
   case 'd':
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    glColor3f(1.0, 1.0, 1.0);
 
     glBegin(GL_POLYGON);
-    for (int i = 0; i < 342; i++) {
+
+    for (int i = 0; i < N; i++) {
       glColor3d((double)rand() / RAND_MAX, (double)rand() / RAND_MAX, (double)rand() / RAND_MAX);
       glVertex3d(quad_data[i][0], quad_data[i][1], quad_data[i][2]);
     }
@@ -222,15 +258,15 @@ void keyPressed(unsigned char key, int x, int y) {
     break;
 
   case 'e':
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     glColor3f(1.0, 1.0, 1.0);
 
     glRasterPos3f(-0.9, 0.5, 0.0);
-    writeBitmapString(GLUT_BITMAP_8_BY_13, "Question (e) answer => by using colors it gives the illusion of what's near and what's far");
+    writeBitmapString(GLUT_BITMAP_8_BY_13, "Question (e) answer => by using colors it gives more illusion of what's near and what's far");
     break;
 
   default:
+
     glColor3f(1.0, 1.0, 1.0);
 
     glRasterPos3f(-0.2, 0.5, 0.0);
