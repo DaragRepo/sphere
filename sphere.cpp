@@ -198,21 +198,36 @@ void keyPressed(unsigned char key, int x, int y) {
 
     glColor3f(1.0, 1.0, 1.0);
 
+    /*
+         remember that GL_LINES works by connecting each two points but it won't connect each 4 points
+         together that's why we need to redraw the points that hasn't been connected again to let it
+         connect(the first if condition) you can see how GL_POLYGON works by reducing the N.
+         and by observing the GL_POLYGON you will find that it connects the last point to the first point
+         which exactly what the second if condition does.
+    */
+
     glBegin(GL_LINES);
 
     for (int i = 0; i < N; i = i + 1 ) {
 
       glVertex3d(quad_data[i][0], quad_data[i][1], quad_data[i][2]);
 
-      /* 
-        to draw a sphere like GL_POLYGON in GL_LINES we need to draw the old points to connect the lines 
-        that hasn't been connected because remember that in lines we connect each 2 points but we don't 
-        connect each 4 lines together 
-      */
-      for (int j =  i  ; j >= i - 2  ; j--) {
-        glVertex3d(quad_data[j][0], quad_data[j][1], quad_data[j][2]);
+
+      if ( i != 0  &&  i + 1 != N )
+      {
+
+        glVertex3f(quad_data[i][0], quad_data[i][1], quad_data[i][2]);
       }
-   
+
+
+      if ( i + 1 == N )
+      {
+
+        glVertex3f(quad_data[i][0], quad_data[i][1], quad_data[i][2]);
+        glVertex3f(quad_data[0][0], quad_data[0][1], quad_data[0][2]);
+      }
+
+
     }
 
     glEnd();
@@ -261,8 +276,9 @@ void keyPressed(unsigned char key, int x, int y) {
 
     glColor3f(1.0, 1.0, 1.0);
 
-    glRasterPos3f(-0.9, 0.5, 0.0);
-    writeBitmapString(GLUT_BITMAP_8_BY_13, "Question (e) answer => by using colors it gives more illusion of what's near and what's far");
+    glRasterPos3f(-0.95, 0.5, 0.0);
+    writeBitmapString(GLUT_BITMAP_8_BY_13, "(e) answer => Lighting gives more illusion of a 3d shape and shows what's near and what's far");
+
     break;
 
   default:
